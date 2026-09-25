@@ -5,12 +5,20 @@ A small `cat` clone written in Rust.
 Rcat was built as a small Rust learning project to practice file handling,
 command-line arguments, error handling, and buffered I/O.
 
+## Status
+
+**Complete.**
+
+The current implementation supports text and arbitrary binary file data by
+streaming file contents directly to stdout.
+
 ## Features
 
 - Read and print the contents of a file
+- Support text and arbitrary binary data
 - Validate that the provided path exists
 - Reject directories as input
-- Buffered file reading using `BufReader`
+- Stream file contents using `BufReader` and `io::copy`
 - Simple command-line interface
 - Clear error messages with appropriate process exit codes
 
@@ -83,22 +91,18 @@ Open file
         ↓
 Create buffered reader
         ↓
-Read file contents
-        ↓
-Print contents
+Stream file contents to stdout
 ```
 
-The file is opened using Rust's `std::fs::File` and read through
-`std::io::BufReader`.
+The file is opened using Rust's `std::fs::File`, wrapped in
+`std::io::BufReader`, and streamed directly to stdout using `std::io::copy`.
 
 ## Limitations
 
-The current implementation reads files as UTF-8 text.
-
-Because Rcat uses `read_to_string()`, arbitrary binary files are not supported
-by the current version.
-
 Rcat currently accepts exactly one file path argument.
+
+It intentionally does not implement all features and command-line options of
+the Unix `cat` utility.
 
 ## Building
 
