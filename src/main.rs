@@ -1,6 +1,6 @@
 use std::{
     env, fs,
-    io::{self, BufReader, Read},
+    io::{self, BufReader, Read, Write},
     process, result,
 };
 
@@ -23,7 +23,15 @@ fn main() {
     }
 
     match read_file_contents(&file_path) {
-        Ok(fc) => print!("{}", fc),
+        Ok(fc) => {
+            let stdout = io::stdout();
+            let mut handle = stdout.lock();
+
+            if let Err(error) = handle.write_all(&fc) {
+                eprintln!("ERROR: couldn't write file contents to stdout. {}", error);
+                process::exit(1)
+            }
+        }
         Err(error) => {
             eprintln!("{error}");
             process::exit(1);
@@ -31,12 +39,12 @@ fn main() {
     }
 }
 
-fn read_file_contents(file_path: &String) -> result::Result<String, io::Error> {
+fn read_file_contents(file_path: &String) -> result::Result<Vec<u8>, io::Error> {
     let file_object = fs::File::open(file_path)?;
 
     let mut buffer_reader = BufReader::new(file_object);
-    let mut contents = String::new();
-    buffer_reader.read_to_string(&mut contents)?;
+    let mut contents: Vec<u8> = Vec::new();
+    buffer_reader.read_to_end(&mut contents)?;
 
     Ok(contents)
 }
